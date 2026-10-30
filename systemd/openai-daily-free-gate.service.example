@@ -1,0 +1,26 @@
+# Example systemd USER unit. Edit the paths, then install with:
+#   mkdir -p ~/.config/systemd/user
+#   cp systemd/openai-daily-free-gate.service.example ~/.config/systemd/user/openai-daily-free-gate.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now openai-daily-free-gate
+# %h expands to your home directory. Change "openai-daily-free-gate" below
+# if you cloned the repository somewhere else.
+
+[Unit]
+Description=Local OpenAI complimentary daily-token gateway
+Documentation=file://%h/openai-daily-free-gate/README.md
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/openai-daily-free-gate
+ExecStart=/usr/bin/python3 %h/openai-daily-free-gate/gate.py --port 18765
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=GATE_UPSTREAM=https://api.openai.com
+
+[Install]
+WantedBy=default.target
